@@ -11,6 +11,11 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- [DARORI L-RAILWAY] ---
+// Railway kaye3tik l-Port f Variable smiytha PORT. 0.0.0.0 hiya l-IP dyal d-deployement.
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // ── EF Core + Identity ──
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -27,7 +32,9 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 
 // ── JWT Authentication ──
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
+// L-SecretKey khodha men env variable ila kant kayna (Security)
+var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? jwtSettings["SecretKey"]!;
+var key = Encoding.UTF8.GetBytes(secretKey);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -71,7 +78,6 @@ builder.Services.AddScoped<ICheckInService, CheckInService>();
 // ── Controllers + JSON ──
 builder.Services.AddControllers(options =>
     {
-        // Let controllers handle validation so we return clean { message } errors
         options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
     })
     .AddJsonOptions(options =>
@@ -82,28 +88,25 @@ builder.Services.AddControllers(options =>
 // ── OpenAPI / Swagger ──
 builder.Services.AddOpenApi();
 
-// ── CORS ──
+// ── CORS (Updated l-Cloud) ──
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+        policy.AllowAnyOrigin() // Men ba3d bdelha b link dyal Vercel exact
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+// Khalli OpenApi khdam hta f production ila bghiti t-testi l-API direct men Railway
+app.MapOpenApi();
 
-app.UseCors("AllowFrontend");
-//app.UseHttpsRedirection();
+app.UseCors("AllowAll"); // Sta3mel l-policy l-jdida
+
 app.UseAuthentication();
 app.UseAuthorization();
 
