@@ -1,0 +1,44 @@
+using H2_Trainning.Data;
+using H2_Trainning.Interfaces;
+using H2_Trainning.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace H2_Trainning.Repositories
+{
+    public class CheckInRepository : ICheckInRepository
+    {
+        private readonly ApplicationDbContext _context;
+
+        public CheckInRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<List<CheckIn>> GetByClientIdAsync(string clientId)
+        {
+            return await _context.CheckIns
+                .Include(c => c.Client)
+                .Where(c => c.ClientId == clientId)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<CheckIn?> GetLatestByClientIdAsync(string clientId)
+        {
+            return await _context.CheckIns
+                .Include(c => c.Client)
+                .Where(c => c.ClientId == clientId)
+                .OrderByDescending(c => c.CreatedAt)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<CheckIn> CreateAsync(CheckIn checkIn)
+        {
+            _context.CheckIns.Add(checkIn);
+            await _context.SaveChangesAsync();
+            return (await _context.CheckIns
+                .Include(c => c.Client)
+                .FirstOrDefaultAsync(c => c.Id == checkIn.Id))!;
+        }
+    }
+}

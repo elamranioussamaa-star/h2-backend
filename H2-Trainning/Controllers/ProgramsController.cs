@@ -1,0 +1,69 @@
+using System.Security.Claims;
+using H2_Trainning.Dtos;
+using H2_Trainning.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace H2_Trainning.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize(Roles = "Coach")]
+    public class ProgramsController : ControllerBase
+    {
+        private readonly IProgramService _service;
+
+        public ProgramsController(IProgramService service)
+        {
+            _service = service;
+        }
+
+        private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var programs = await _service.GetByCoachIdAsync(GetUserId());
+            return Ok(programs);
+        }
+
+        [HttpGet("summary")]
+        public async Task<IActionResult> GetSummaries()
+        {
+            var programs = await _service.GetSummariesByCoachIdAsync(GetUserId());
+            return Ok(programs);
+        }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var program = await _service.GetByIdAsync(id);
+            if (program == null) return NotFound();
+            return Ok(program);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateProgramDto dto)
+        {
+            var result = await _service.CreateAsync(GetUserId(), dto);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateProgramDto dto)
+        {
+            var result = await _service.UpdateAsync(id, GetUserId(), dto);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var deleted = await _service.DeleteAsync(id, GetUserId());
+            if (!deleted) return NotFound();
+            return NoContent();
+        }
+    }
+}

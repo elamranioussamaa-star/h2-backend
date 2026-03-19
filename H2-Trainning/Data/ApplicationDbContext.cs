@@ -1,0 +1,92 @@
+using H2_Trainning.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
+namespace H2_Trainning.Data
+{
+    public class ApplicationDbContext : IdentityDbContext<AppUser>
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+        public DbSet<H2_Trainning.Models.Program> Programs { get; set; }
+        public DbSet<Exercise> Exercises { get; set; }
+        public DbSet<Meal> Meals { get; set; }
+        public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<ExerciseLog> ExerciseLogs { get; set; }
+        public DbSet<AvailabilitySlot> AvailabilitySlots { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<CheckIn> CheckIns { get; set; }
+        public DbSet<PostLike> PostLikes { get; set; }
+        public DbSet<PostComment> PostComments { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            // 1. Configuration dial les Reservations (Cascade Restrict)
+            builder.Entity<Reservation>()
+                .HasOne(r => r.Client)
+                .WithMany(u => u.ClientReservations)
+                .HasForeignKey(r => r.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Reservation>()
+                .HasOne(r => r.Coach)
+                .WithMany(u => u.CoachReservations)
+                .HasForeignKey(r => r.CoachId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 2. Fix Multiple Cascade Paths dial l-Assignments (L-mouchkil li kan tla3 lik)
+            builder.Entity<Assignment>()
+                .HasOne(a => a.Client)
+                .WithMany(u => u.Assignments)
+                .HasForeignKey(a => a.ClientId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Assignment>()
+                .HasOne(a => a.Program)
+                .WithMany(p => p.Assignments)
+                .HasForeignKey(a => a.ProgramId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // 3. Conversion dial les Enums (Bach t-hénna mn les types errors)
+            builder.Entity<Exercise>().Property(e => e.MediaType).HasConversion<string>();
+            builder.Entity<AppUser>().Property(u => u.Role).HasConversion<string>();
+            builder.Entity<Assignment>().Property(a => a.Status).HasConversion<string>(); // <-- Zid hadi darouri
+            builder.Entity<Reservation>().Property(r => r.Status).HasConversion<string>();
+
+            // 4. Performance indexes for frequently queried foreign keys
+            builder.Entity<Assignment>().HasIndex(a => a.ClientId);
+            builder.Entity<Assignment>().HasIndex(a => a.ProgramId);
+            builder.Entity<AppUser>().HasIndex(u => u.CoachId);
+            builder.Entity<Post>().HasIndex(p => p.CoachId);
+            builder.Entity<CheckIn>().HasIndex(c => c.ClientId);
+
+            // 5. Post constraints to avoid cascade delete cycles
+            builder.Entity<PostLike>()
+                .HasOne(l => l.Post)
+                .WithMany(p => p.Likes)
+                .HasForeignKey(l => l.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PostLike>()
+                .HasOne(l => l.User)
+                .WithMany() // AppUser doesn't need to navigate to Likes
+                .HasForeignKey(l => l.UserId)
+                .OnDelete(DeleteBehavior.NoAction); // Important to avoid multiple cascade paths
+
+            builder.Entity<PostComment>()
+                .HasOne(c => c.Post)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PostComment>()
+                .HasOne(c => c.User)
+                .WithMany() // AppUser doesn't need to navigate to Comments
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.NoAction); // Important to avoid multiple cascade paths
+        }
+    }
+}

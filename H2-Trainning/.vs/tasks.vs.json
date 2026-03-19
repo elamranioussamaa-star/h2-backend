@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-H2-Trainning",
+      "appliesTo": "/",
+      "type": "launch"
+    }
+  ]
+}

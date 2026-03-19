@@ -1,0 +1,6 @@
+@H2_Trainning_HostAddress = http://localhost:5170
+
+GET {{H2_Trainning_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
