@@ -16,8 +16,10 @@ namespace H2_Trainning.Repositories
         public async Task<List<H2_Trainning.Models.Program>> GetByCoachIdAsync(string coachId)
         {
             return await _context.Programs
-                .Include(p => p.Exercises.OrderBy(e => e.SortOrder))
-                .Include(p => p.Meals.OrderBy(m => m.SortOrder))
+                .Include(p => p.Days.OrderBy(d => d.DayNumber))
+                    .ThenInclude(d => d.Exercises.OrderBy(e => e.SortOrder))
+                .Include(p => p.Days.OrderBy(d => d.DayNumber))
+                    .ThenInclude(d => d.Meals.OrderBy(m => m.SortOrder))
                 .Where(p => p.CoachId == coachId)
                 .OrderByDescending(p => p.UpdatedAt)
                 .AsSplitQuery()
@@ -35,8 +37,10 @@ namespace H2_Trainning.Repositories
         public async Task<H2_Trainning.Models.Program?> GetByIdAsync(int id)
         {
             return await _context.Programs
-                .Include(p => p.Exercises.OrderBy(e => e.SortOrder))
-                .Include(p => p.Meals.OrderBy(m => m.SortOrder))
+                .Include(p => p.Days.OrderBy(d => d.DayNumber))
+                    .ThenInclude(d => d.Exercises.OrderBy(e => e.SortOrder))
+                .Include(p => p.Days.OrderBy(d => d.DayNumber))
+                    .ThenInclude(d => d.Meals.OrderBy(m => m.SortOrder))
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
@@ -58,14 +62,20 @@ namespace H2_Trainning.Repositories
         public async Task<bool> DeleteAsync(int id)
         {
             var program = await _context.Programs
-                .Include(p => p.Exercises)
-                .Include(p => p.Meals)
+                .Include(p => p.Days)
+                    .ThenInclude(d => d.Exercises)
+                .Include(p => p.Days)
+                    .ThenInclude(d => d.Meals)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (program == null) return false;
 
-            _context.Exercises.RemoveRange(program.Exercises);
-            _context.Meals.RemoveRange(program.Meals);
+            foreach (var day in program.Days)
+            {
+                _context.Exercises.RemoveRange(day.Exercises);
+                _context.Meals.RemoveRange(day.Meals);
+            }
+            _context.ProgramDays.RemoveRange(program.Days);
             _context.Programs.Remove(program);
             await _context.SaveChangesAsync();
             return true;

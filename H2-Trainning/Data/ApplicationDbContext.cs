@@ -9,6 +9,7 @@ namespace H2_Trainning.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<H2_Trainning.Models.Program> Programs { get; set; }
+        public DbSet<ProgramDay> ProgramDays { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<Meal> Meals { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
@@ -36,6 +37,12 @@ namespace H2_Trainning.Data
                 .WithMany(u => u.CoachReservations)
                 .HasForeignKey(r => r.CoachId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ProgramDay>()
+                .HasOne(pd => pd.Program)
+                .WithMany(p => p.Days)
+                .HasForeignKey(pd => pd.ProgramId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // 2. Fix Multiple Cascade Paths dial l-Assignments (L-mouchkil li kan tla3 lik)
             builder.Entity<Assignment>()

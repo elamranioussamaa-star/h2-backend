@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using System.ComponentModel.DataAnnotations;
 
 namespace H2_Trainning.Models
@@ -18,8 +18,8 @@ namespace H2_Trainning.Models
         public string? Notes { get; set; }
         public string? MediaUrl { get; set; }
         public MediaType? MediaType { get; set; } // Daba ghadi i-t-3ref
-        public int ProgramId { get; set; }
-        public Program Program { get; set; }
+        public int ProgramDayId { get; set; }
+        public ProgramDay ProgramDay { get; set; }
         public int SortOrder { get; set; }
     }
 

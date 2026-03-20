@@ -47,24 +47,30 @@ namespace H2_Trainning.Services
                 CoachId = coachId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                Exercises = dto.Exercises.Select((e, i) => new Exercise
+                Days = dto.Days.Select(d => new ProgramDay
                 {
-                    Name = e.Name,
-                    Sets = e.Sets,
-                    Reps = e.Reps,
-                    Notes = e.Notes,
-                    MediaUrl = e.MediaUrl,
-                    MediaType = ParseMediaType(e.MediaType),
-                    SortOrder = e.SortOrder > 0 ? e.SortOrder : i
-                }).ToList(),
-                Meals = dto.Meals.Select((m, i) => new Meal
-                {
-                    Name = m.Name,
-                    Macros = m.Macros,
-                    Time = m.Time,
-                    PhotoUrl = m.PhotoUrl,
-                    Ingredients = m.Ingredients,
-                    SortOrder = m.SortOrder > 0 ? m.SortOrder : i
+                    Name = d.Name,
+                    DayNumber = d.DayNumber,
+                    IsRestDay = d.IsRestDay,
+                    Exercises = d.Exercises.Select((e, i) => new Exercise
+                    {
+                        Name = e.Name,
+                        Sets = e.Sets,
+                        Reps = e.Reps,
+                        Notes = e.Notes,
+                        MediaUrl = e.MediaUrl,
+                        MediaType = ParseMediaType(e.MediaType),
+                        SortOrder = e.SortOrder > 0 ? e.SortOrder : i
+                    }).ToList(),
+                    Meals = d.Meals.Select((m, i) => new Meal
+                    {
+                        Name = m.Name,
+                        Macros = m.Macros,
+                        Time = m.Time,
+                        PhotoUrl = m.PhotoUrl,
+                        Ingredients = m.Ingredients,
+                        SortOrder = m.SortOrder > 0 ? m.SortOrder : i
+                    }).ToList()
                 }).ToList()
             };
 
@@ -82,35 +88,36 @@ namespace H2_Trainning.Services
             existing.NutritionalBases = dto.NutritionalBases;
             existing.UpdatedAt = DateTime.UtcNow;
 
-            // Replace exercises and meals
-            existing.Exercises.Clear();
-            foreach (var (e, i) in dto.Exercises.Select((e, i) => (e, i)))
+            // Simple update: Clear all days and re-add them 
+            // In a production scenario, we'd do a more granular merge, but for this simpler structure:
+            existing.Days.Clear();
+            foreach (var d in dto.Days)
             {
-                existing.Exercises.Add(new Exercise
+                existing.Days.Add(new ProgramDay
                 {
-                    Name = e.Name,
-                    Sets = e.Sets,
-                    Reps = e.Reps,
-                    Notes = e.Notes,
-                    MediaUrl = e.MediaUrl,
-                    MediaType = ParseMediaType(e.MediaType),
-                    SortOrder = e.SortOrder > 0 ? e.SortOrder : i,
-                    ProgramId = id
-                });
-            }
-
-            existing.Meals.Clear();
-            foreach (var (m, i) in dto.Meals.Select((m, i) => (m, i)))
-            {
-                existing.Meals.Add(new Meal
-                {
-                    Name = m.Name,
-                    Macros = m.Macros,
-                    Time = m.Time,
-                    PhotoUrl = m.PhotoUrl,
-                    Ingredients = m.Ingredients,
-                    SortOrder = m.SortOrder > 0 ? m.SortOrder : i,
-                    ProgramId = id
+                    Name = d.Name,
+                    DayNumber = d.DayNumber,
+                    IsRestDay = d.IsRestDay,
+                    ProgramId = id,
+                    Exercises = d.Exercises.Select((e, i) => new Exercise
+                    {
+                        Name = e.Name,
+                        Sets = e.Sets,
+                        Reps = e.Reps,
+                        Notes = e.Notes,
+                        MediaUrl = e.MediaUrl,
+                        MediaType = ParseMediaType(e.MediaType),
+                        SortOrder = e.SortOrder > 0 ? e.SortOrder : i
+                    }).ToList(),
+                    Meals = d.Meals.Select((m, i) => new Meal
+                    {
+                        Name = m.Name,
+                        Macros = m.Macros,
+                        Time = m.Time,
+                        PhotoUrl = m.PhotoUrl,
+                        Ingredients = m.Ingredients,
+                        SortOrder = m.SortOrder > 0 ? m.SortOrder : i
+                    }).ToList()
                 });
             }
 
@@ -140,26 +147,33 @@ namespace H2_Trainning.Services
             CoachId = p.CoachId,
             CreatedAt = p.CreatedAt,
             UpdatedAt = p.UpdatedAt,
-            Exercises = p.Exercises?.Select(e => new ExerciseDto
+            Days = p.Days?.Select(d => new ProgramDayDto
             {
-                Id = e.Id,
-                Name = e.Name,
-                Sets = e.Sets,
-                Reps = e.Reps,
-                Notes = e.Notes,
-                MediaUrl = e.MediaUrl,
-                MediaType = e.MediaType?.ToString(),
-                SortOrder = e.SortOrder
-            }).ToList() ?? new(),
-            Meals = p.Meals?.Select(m => new MealDto
-            {
-                Id = m.Id,
-                Name = m.Name,
-                Macros = m.Macros,
-                Time = m.Time,
-                PhotoUrl = m.PhotoUrl,
-                Ingredients = m.Ingredients,
-                SortOrder = m.SortOrder
+                Id = d.Id,
+                Name = d.Name,
+                DayNumber = d.DayNumber,
+                IsRestDay = d.IsRestDay,
+                Exercises = d.Exercises?.Select(e => new ExerciseDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Sets = e.Sets,
+                    Reps = e.Reps,
+                    Notes = e.Notes,
+                    MediaUrl = e.MediaUrl,
+                    MediaType = e.MediaType?.ToString(),
+                    SortOrder = e.SortOrder
+                }).ToList() ?? new(),
+                Meals = d.Meals?.Select(m => new MealDto
+                {
+                    Id = m.Id,
+                    Name = m.Name,
+                    Macros = m.Macros,
+                    Time = m.Time,
+                    PhotoUrl = m.PhotoUrl,
+                    Ingredients = m.Ingredients,
+                    SortOrder = m.SortOrder
+                }).ToList() ?? new()
             }).ToList() ?? new()
         };
     }

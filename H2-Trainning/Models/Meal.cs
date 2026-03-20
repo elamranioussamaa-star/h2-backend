@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace H2_Trainning.Models
 {
@@ -13,8 +13,8 @@ namespace H2_Trainning.Models
         public string Time { get; set; }       // "Breakfast", "12:00 PM"
         public string? PhotoUrl { get; set; }  // relative path to uploaded file
         public string? Ingredients { get; set; }
-        public int ProgramId { get; set; }     // FK
-        public Program Program { get; set; }
+        public int ProgramDayId { get; set; }     // FK
+        public ProgramDay ProgramDay { get; set; }
         public int SortOrder { get; set; }
     }
 }

@@ -72,31 +72,38 @@ namespace H2_Trainning.Services
                     CoachId = program.CoachId,
                     CreatedAt = program.CreatedAt,
                     UpdatedAt = program.UpdatedAt,
-                    Exercises = program.Exercises?.Select(e => {
-                        var log = latest.ExerciseLogs?.FirstOrDefault(l => l.ExerciseId == e.Id);
-                        return new ExerciseDto
-                        {
-                            Id = e.Id,
-                            Name = e.Name,
-                            Sets = e.Sets,
-                            Reps = e.Reps,
-                            Notes = e.Notes,
-                            MediaUrl = e.MediaUrl,
-                            MediaType = e.MediaType?.ToString(),
-                            SortOrder = e.SortOrder,
-                            IsCompleted = log?.IsCompleted,
-                            ClientNotes = log?.ClientNotes
-                        };
-                    }).ToList() ?? new(),
-                    Meals = program.Meals?.Select(m => new MealDto
+                    Days = program.Days?.Select(d => new ProgramDayDto
                     {
-                        Id = m.Id,
-                        Name = m.Name,
-                        Macros = m.Macros,
-                        Time = m.Time,
-                        PhotoUrl = m.PhotoUrl,
-                        Ingredients = m.Ingredients,
-                        SortOrder = m.SortOrder
+                        Id = d.Id,
+                        Name = d.Name,
+                        DayNumber = d.DayNumber,
+                        IsRestDay = d.IsRestDay,
+                        Exercises = d.Exercises?.Select(e => {
+                            var log = latest.ExerciseLogs?.FirstOrDefault(l => l.ExerciseId == e.Id);
+                            return new ExerciseDto
+                            {
+                                Id = e.Id,
+                                Name = e.Name,
+                                Sets = e.Sets,
+                                Reps = e.Reps,
+                                Notes = e.Notes,
+                                MediaUrl = e.MediaUrl,
+                                MediaType = e.MediaType?.ToString(),
+                                SortOrder = e.SortOrder,
+                                IsCompleted = log?.IsCompleted,
+                                ClientNotes = log?.ClientNotes
+                            };
+                        }).ToList() ?? new(),
+                        Meals = d.Meals?.Select(m => new MealDto
+                        {
+                            Id = m.Id,
+                            Name = m.Name,
+                            Macros = m.Macros,
+                            Time = m.Time,
+                            PhotoUrl = m.PhotoUrl,
+                            Ingredients = m.Ingredients,
+                            SortOrder = m.SortOrder
+                        }).ToList() ?? new()
                     }).ToList() ?? new()
                 }
             };

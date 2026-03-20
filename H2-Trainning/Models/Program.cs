@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace H2_Trainning.Models
 {
@@ -24,8 +24,7 @@ namespace H2_Trainning.Models
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation
-        public ICollection<Exercise> Exercises { get; set; }
-        public ICollection<Meal> Meals { get; set; }
+        public ICollection<ProgramDay> Days { get; set; } = new List<ProgramDay>();
         public ICollection<Assignment> Assignments { get; set; }
     }
 }

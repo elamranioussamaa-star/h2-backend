@@ -67,6 +67,27 @@ namespace H2_Trainning.Dtos
         public int SortOrder { get; set; }
     }
 
+    // ── ProgramDay ──
+    public class ProgramDayDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public int DayNumber { get; set; }
+        public bool IsRestDay { get; set; }
+        public List<ExerciseDto> Exercises { get; set; } = new();
+        public List<MealDto> Meals { get; set; } = new();
+    }
+
+    public class CreateProgramDayDto
+    {
+        [Required, MaxLength(100)]
+        public string Name { get; set; } = string.Empty;
+        public int DayNumber { get; set; }
+        public bool IsRestDay { get; set; }
+        public List<CreateExerciseDto> Exercises { get; set; } = new();
+        public List<CreateMealDto> Meals { get; set; } = new();
+    }
+
     // ── Program ──
     public class ProgramDto
     {
@@ -77,8 +98,7 @@ namespace H2_Trainning.Dtos
         public string CoachId { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public List<ExerciseDto> Exercises { get; set; } = new();
-        public List<MealDto> Meals { get; set; } = new();
+        public List<ProgramDayDto> Days { get; set; } = new();
     }
 
     public class ProgramSummaryDto
@@ -100,8 +120,7 @@ namespace H2_Trainning.Dtos
         [MaxLength(500)]
         public string? NutritionalBases { get; set; }
 
-        public List<CreateExerciseDto> Exercises { get; set; } = new();
-        public List<CreateMealDto> Meals { get; set; } = new();
+        public List<CreateProgramDayDto> Days { get; set; } = new();
     }
 
     public class UpdateProgramDto
@@ -115,7 +134,6 @@ namespace H2_Trainning.Dtos
         [MaxLength(500)]
         public string? NutritionalBases { get; set; }
 
-        public List<CreateExerciseDto> Exercises { get; set; } = new();
-        public List<CreateMealDto> Meals { get; set; } = new();
+        public List<CreateProgramDayDto> Days { get; set; } = new();
     }
 }
