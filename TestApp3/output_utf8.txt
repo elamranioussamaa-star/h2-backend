@@ -1,0 +1,11 @@
+﻿SUCCESS: DELETE FROM Exercises
+SUCCESS: DELETE FROM Meals
+SUCCESS: ALTER TABLE [Exercises] DROP CONSTRAINT IF EXISTS [FK_Exercises_Programs_ProgramId]
+SUCCESS: ALTER TABLE [Meals] DROP CONSTRAINT IF EXISTS [FK_Meals_Programs_ProgramId]
+SUCCESS: IF OBJECT_ID('ProgramDays') IS NULL BEGIN CREATE TABLE [ProgramDays] ( [Id] int NOT NULL IDENTITY, [Name] nvarchar(100) NOT NULL, [DayNumber] int NOT NULL, [IsRestDay] bit NOT NULL, [ProgramId] int NOT NULL, CONSTRAINT [PK_ProgramDays] PRIMARY KEY ([Id]), CONSTRAINT [FK_ProgramDays_Programs_ProgramId] FOREIGN KEY ([ProgramId]) REFERENCES [Programs] ([Id]) ON DELETE CASCADE ); END
+SUCCESS: IF COL_LENGTH('Exercises', 'ProgramId') IS NOT NULL BEGIN EXEC sp_rename 'Exercises.ProgramId', 'ProgramDayId', 'COLUMN'; END
+SUCCESS: IF COL_LENGTH('Meals', 'ProgramId') IS NOT NULL BEGIN EXEC sp_rename 'Meals.ProgramId', 'ProgramDayId', 'COLUMN'; END
+SUCCESS: ALTER TABLE [Exercises] DROP CONSTRAINT IF EXISTS [FK_Exercises_ProgramDays_ProgramDayId]
+SUCCESS: ALTER TABLE [Exercises] ADD CONSTRAINT [FK_Exercises_ProgramDays_ProgramDayId] FOREIGN KEY ([ProgramDayId]) REFERENCES [ProgramDays] ([Id]) ON DELETE CASCADE
+SUCCESS: ALTER TABLE [Meals] DROP CONSTRAINT IF EXISTS [FK_Meals_ProgramDays_ProgramDayId]
+SUCCESS: ALTER TABLE [Meals] ADD CONSTRAINT [FK_Meals_ProgramDays_ProgramDayId] FOREIGN KEY ([ProgramDayId]) REFERENCES [ProgramDays] ([Id]) ON DELETE CASCADE

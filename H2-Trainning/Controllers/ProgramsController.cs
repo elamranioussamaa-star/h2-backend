@@ -47,6 +47,15 @@ namespace H2_Trainning.Controllers
             }
         }
 
+        [HttpGet("debug-db")]
+        [AllowAnonymous]
+        public IActionResult DebugDb([FromServices] H2_Trainning.Data.ApplicationDbContext db, [FromServices] IConfiguration config)
+        {
+            var dbName = db.Database.GetDbConnection().Database;
+            var connStr = config.GetConnectionString("DefaultConnection");
+            return Ok(new { DbName = dbName, HasConnStr = !string.IsNullOrEmpty(connStr) });
+        }
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateProgramDto dto)
