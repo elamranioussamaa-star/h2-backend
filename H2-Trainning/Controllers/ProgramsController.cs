@@ -38,40 +38,16 @@ namespace H2_Trainning.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            try {
-                var program = await _service.GetByIdAsync(id);
-                if (program == null) return NotFound();
-                return Ok(program);
-            } catch (Exception ex) {
-                return Ok("EXCEPTION_GET: " + ex.ToString());
-            }
-        }
-
-        [HttpGet("debug-db")]
-        [AllowAnonymous]
-        public IActionResult DebugDb([FromServices] H2_Trainning.Data.ApplicationDbContext db, [FromServices] IConfiguration config)
-        {
-            var dbName = db.Database.GetDbConnection().Database;
-            var connStr = config.GetConnectionString("DefaultConnection");
-            return Ok(new { DbName = dbName, HasConnStr = !string.IsNullOrEmpty(connStr) });
+            var program = await _service.GetByIdAsync(id);
+            if (program == null) return NotFound();
+            return Ok(program);
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateProgramDto dto)
         {
-            try 
-            {
-                var db = HttpContext.RequestServices.GetRequiredService<H2_Trainning.Data.ApplicationDbContext>();
-                var coachId = db.Users.FirstOrDefault()?.Id ?? "no-coach";
-                var result = await _service.CreateAsync(coachId, dto);
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-            }
-            catch (Exception ex)
-            {
-                // Return 200 with error so CORS isn't blocked by the browser
-                return Ok("EXCEPTION: " + ex.ToString());
-            }
+            var result = await _service.CreateAsync(GetUserId(), dto);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         [HttpPut("{id}")]
