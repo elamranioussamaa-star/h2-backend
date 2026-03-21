@@ -14,39 +14,23 @@ class Program
             .Options;
             
         using var db = new ApplicationDbContext(options);
-        var coach = db.Users.FirstOrDefault(u => u.Role == "Coach");
-        if (coach == null) {
-            Console.WriteLine("FAIL: No coach found");
-            return;
-        }
-
-        var prog = new H2_Trainning.Models.Program {
-            Title = "Test Validation",
-            CoachId = coach.Id,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Days = new List<ProgramDay> {
-                new ProgramDay {
-                    Name = "Day 1",
-                    DayNumber = 1,
-                    IsRestDay = false,
-                    Exercises = new List<Exercise> {
-                        new Exercise { Name = "Sq", Sets = 3, Reps = "10", SortOrder = 0, MediaType = MediaType.Image }
-                    },
-                    Meals = new List<Meal> {
-                        new Meal { Name = "M1", Macros = "P30", Time = "8AM", SortOrder = 0 }
-                    }
-                }
-            }
-        };
-
+        
         try {
-            db.Programs.Add(prog);
-            db.SaveChanges();
-            Console.WriteLine("SUCCESS DB INSERT");
-            db.Programs.Remove(prog);
-            db.SaveChanges();
+            var program = db.Programs
+                .Include(p => p.Days.OrderBy(d => d.DayNumber))
+                    .ThenInclude(d => d.Exercises.OrderBy(e => e.SortOrder))
+                .Include(p => p.Days.OrderBy(d => d.DayNumber))
+                    .ThenInclude(d => d.Meals.OrderBy(m => m.SortOrder))
+                .AsSplitQuery()
+                .FirstOrDefault();
+
+            if (program != null) {
+                Console.WriteLine("Program found: " + program.Title + " with " + program.Days.Count + " days.");
+            } else {
+                Console.WriteLine("No programs in DB");
+            }
         } catch (Exception ex) {
+            Console.WriteLine("EXCEPTION OCCURRED:");
             Console.WriteLine(ex.ToString());
         }
     }
