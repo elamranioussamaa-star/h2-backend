@@ -66,9 +66,25 @@ namespace H2_Trainning.Repositories
                     .ThenInclude(d => d.Exercises)
                 .Include(p => p.Days)
                     .ThenInclude(d => d.Meals)
+                .Include(p => p.Assignments)
+                    .ThenInclude(a => a.ExerciseLogs)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (program == null) return false;
+
+            // Delete assignments and their associated exercise logs first
+            // (EF constraint prevents cascading delete of assignments automatically)
+            if (program.Assignments != null)
+            {
+                foreach (var assignment in program.Assignments)
+                {
+                    if (assignment.ExerciseLogs != null)
+                    {
+                        _context.ExerciseLogs.RemoveRange(assignment.ExerciseLogs);
+                    }
+                }
+                _context.Assignments.RemoveRange(program.Assignments);
+            }
 
             foreach (var day in program.Days)
             {
@@ -77,6 +93,7 @@ namespace H2_Trainning.Repositories
             }
             _context.ProgramDays.RemoveRange(program.Days);
             _context.Programs.Remove(program);
+            
             await _context.SaveChangesAsync();
             return true;
         }
