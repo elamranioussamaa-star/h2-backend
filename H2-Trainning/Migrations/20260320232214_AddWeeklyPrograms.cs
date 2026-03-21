@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -64,6 +64,10 @@ namespace H2_Trainning.Migrations
                 name: "IX_ProgramDays_ProgramId",
                 table: "ProgramDays",
                 column: "ProgramId");
+
+            // Clear old data to prevent foreign key conflicts!
+            migrationBuilder.Sql("DELETE FROM Exercises");
+            migrationBuilder.Sql("DELETE FROM Meals");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Exercises_ProgramDays_ProgramDayId",

@@ -1,0 +1,6 @@
+C:\Users\oelam\OneDrive\Desktop\H2-Trainning\H2-Trainning-Backend\TestApp3\obj\Debug\net9.0\TestApp3.csproj.AssemblyReference.cache
+C:\Users\oelam\OneDrive\Desktop\H2-Trainning\H2-Trainning-Backend\TestApp3\obj\Debug\net9.0\TestApp3.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\oelam\OneDrive\Desktop\H2-Trainning\H2-Trainning-Backend\TestApp3\obj\Debug\net9.0\TestApp3.AssemblyInfoInputs.cache
+C:\Users\oelam\OneDrive\Desktop\H2-Trainning\H2-Trainning-Backend\TestApp3\obj\Debug\net9.0\TestApp3.AssemblyInfo.cs
+C:\Users\oelam\OneDrive\Desktop\H2-Trainning\H2-Trainning-Backend\TestApp3\obj\Debug\net9.0\TestApp3.csproj.CoreCompileInputs.cache
+C:\Users\oelam\OneDrive\Desktop\H2-Trainning\H2-Trainning-Backend\TestApp3\obj\Debug\net9.0\TestApp3.sourcelink.json
