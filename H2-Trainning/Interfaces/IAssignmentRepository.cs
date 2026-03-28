@@ -15,6 +15,7 @@ namespace H2_Trainning.Interfaces
         Task<ExerciseLog?> GetExerciseLogAsync(int assignmentId, int exerciseId);
         Task<ExerciseLog> AddExerciseLogAsync(ExerciseLog log);
         Task<ExerciseLog> UpdateExerciseLogAsync(ExerciseLog log);
-        Task<List<ExerciseLog>> GetExerciseWeightHistoryAsync(string clientId, int exerciseId);
+        Task<List<WeightHistoryLog>> GetExerciseWeightHistoryAsync(string clientId, int exerciseId);
+        Task AddOrUpdateWeightHistoryAsync(string clientId, int exerciseId, double weight, string? notes, DateTime date);
     }
 }

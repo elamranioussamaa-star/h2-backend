@@ -20,6 +20,7 @@ namespace H2_Trainning.Data
         public DbSet<CheckIn> CheckIns { get; set; }
         public DbSet<PostLike> PostLikes { get; set; }
         public DbSet<PostComment> PostComments { get; set; }
+        public DbSet<WeightHistoryLog> WeightHistoryLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -94,6 +95,19 @@ namespace H2_Trainning.Data
                 .WithMany() // AppUser doesn't need to navigate to Comments
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.NoAction); // Important to avoid multiple cascade paths
+
+            // 6. WeightHistoryLog constraints
+            builder.Entity<WeightHistoryLog>()
+                .HasOne(w => w.Client)
+                .WithMany(u => u.WeightHistoryLogs)
+                .HasForeignKey(w => w.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WeightHistoryLog>()
+                .HasOne(w => w.Exercise)
+                .WithMany()
+                .HasForeignKey(w => w.ExerciseId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

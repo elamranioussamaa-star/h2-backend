@@ -18,7 +18,7 @@ namespace H2_Trainning.Repositories
         public async Task<List<AppUser>> GetClientsByCoachIdAsync(string coachId)
         {
             return await _context.Users
-                .Where(u => u.Role == Role.Client && u.CoachId == coachId)
+                .Where(u => u.Role == Role.Client && u.CoachId == coachId && u.IsApproved)
                 .OrderBy(u => u.FullName)
                 .ToListAsync();
         }
@@ -28,6 +28,7 @@ namespace H2_Trainning.Repositories
             return await _context.Users
                 .Where(u => u.Role == Role.Client
                          && u.CoachId == coachId
+                         && u.IsApproved
                          && u.FullName.Contains(query))
                 .OrderBy(u => u.FullName)
                 .ToListAsync();
@@ -65,6 +66,26 @@ namespace H2_Trainning.Repositories
 
             var checkIns = _context.CheckIns.Where(c => c.ClientId == clientId);
             _context.CheckIns.RemoveRange(checkIns);
+
+            _context.Users.Remove(client);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<AppUser>> GetPendingClientsAsync()
+        {
+            return await _context.Users
+                .Where(u => u.Role == Role.Client && !u.IsApproved)
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+        }
+
+        public async Task<bool> DeletePendingAsync(string clientId)
+        {
+            var client = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == clientId && u.Role == Role.Client && !u.IsApproved);
+
+            if (client == null) return false;
 
             _context.Users.Remove(client);
             await _context.SaveChangesAsync();

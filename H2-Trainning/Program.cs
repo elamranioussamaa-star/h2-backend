@@ -12,9 +12,11 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 // --- [DARORI L-RAILWAY] ---
-// Railway kaye3tik l-Port f Variable smiytha PORT. 0.0.0.0 hiya l-IP dyal d-deployement.
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+if (builder.Environment.IsProduction())
+{
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
 
 // ── EF Core + Identity ──
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -97,10 +99,12 @@ builder.Services.AddCors(options =>
                   "http://localhost:3000", 
                   "http://localhost:5173", 
                   "http://localhost:5174",
+                  "http://localhost:5175",
                   "https://h2-trainning.vercel.app",
                   "https://www.h2-coaching.com",
                   "https://h2-coaching.com"
               )
+              .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost") // Allow any localhost port
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

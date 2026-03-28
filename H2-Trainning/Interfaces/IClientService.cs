@@ -9,5 +9,8 @@ namespace H2_Trainning.Interfaces
         Task<UserDto> CreateClientAsync(string coachId, CreateClientDto dto);
         Task<UserDto?> GetByIdAsync(string id);
         Task<bool> DeleteClientAsync(string clientId, string coachId);
+        Task<List<UserDto>> GetPendingClientsAsync();
+        Task<UserDto> ApproveClientAsync(string clientId, string coachId);
+        Task<bool> RejectClientAsync(string clientId);
     }
 }

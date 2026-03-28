@@ -78,6 +78,17 @@ namespace H2_Trainning.Services
                 log.Weight = dto.Weight;
                 await _repo.UpdateExerciseLogAsync(log);
             }
+
+            // Track weight history if a weight is provided
+            if (dto.Weight.HasValue)
+            {
+                var assignment = await _repo.GetByIdAsync(assignmentId);
+                if (assignment != null)
+                {
+                    await _repo.AddOrUpdateWeightHistoryAsync(assignment.ClientId, exerciseId, dto.Weight.Value, dto.ClientNotes, DateTime.UtcNow);
+                }
+            }
+
             return true;
         }
 
@@ -86,8 +97,9 @@ namespace H2_Trainning.Services
             var history = await _repo.GetExerciseWeightHistoryAsync(clientId, exerciseId);
             return history.Select(h => new
             {
-                Date = h.Assignment.AssignedDate,
-                Weight = h.Weight
+                Date = h.LoggedAt,
+                Weight = h.Weight,
+                Notes = h.Notes
             }).ToList();
         }
 

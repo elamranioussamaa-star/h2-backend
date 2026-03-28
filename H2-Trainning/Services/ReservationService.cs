@@ -71,7 +71,7 @@ namespace H2_Trainning.Services
             return MapToDto(reservation);
         }
 
-        public async Task<ReservationDto?> RejectAsync(int id, string coachId)
+        public async Task<ReservationDto?> RejectAsync(int id, string coachId, string? reason)
         {
             var reservation = await _repo.GetByIdAsync(id);
             if (reservation == null) return null;
@@ -79,6 +79,7 @@ namespace H2_Trainning.Services
             if (reservation.Status != ReservationStatus.Pending) return null;
 
             reservation.Status = ReservationStatus.Rejected;
+            reservation.RejectionReason = reason;
 
             // Free the slot so others can book
             var slot = await _slotRepo.GetByIdAsync(reservation.SlotId);
@@ -122,6 +123,7 @@ namespace H2_Trainning.Services
             StartTime = r.Slot?.StartTime.ToString("HH:mm") ?? "",
             EndTime = r.Slot?.EndTime.ToString("HH:mm") ?? "",
             Status = r.Status.ToString(),
+            RejectionReason = r.RejectionReason,
             CreatedAt = r.CreatedAt
         };
     }

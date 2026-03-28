@@ -1,4 +1,4 @@
-﻿using H2_Trainning.Enums;
+using H2_Trainning.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace H2_Trainning.Models
@@ -17,6 +17,8 @@ namespace H2_Trainning.Models
         public AppUser Coach { get; set; }
         [Required]
         public ReservationStatus Status { get; set; } = ReservationStatus.Confirmed;
+        [MaxLength(500)]
+        public string? RejectionReason { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 

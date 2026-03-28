@@ -4,6 +4,7 @@ using H2_Trainning.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace H2_Trainning.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260328112807_AddIsApprovedToUser")]
+    partial class AddIsApprovedToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -536,36 +539,6 @@ namespace H2_Trainning.Migrations
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("H2_Trainning.Models.WeightHistoryLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("LoggedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("Weight")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClientId");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.ToTable("WeightHistoryLogs");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -793,7 +766,7 @@ namespace H2_Trainning.Migrations
             modelBuilder.Entity("H2_Trainning.Models.Post", b =>
                 {
                     b.HasOne("H2_Trainning.Models.AppUser", "Coach")
-                        .WithMany("Posts")
+                        .WithMany()
                         .HasForeignKey("CoachId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -888,25 +861,6 @@ namespace H2_Trainning.Migrations
                     b.Navigation("Slot");
                 });
 
-            modelBuilder.Entity("H2_Trainning.Models.WeightHistoryLog", b =>
-                {
-                    b.HasOne("H2_Trainning.Models.AppUser", "Client")
-                        .WithMany("WeightHistoryLogs")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("H2_Trainning.Models.Exercise", "Exercise")
-                        .WithMany()
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Exercise");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -969,10 +923,6 @@ namespace H2_Trainning.Migrations
                     b.Navigation("Clients");
 
                     b.Navigation("CoachReservations");
-
-                    b.Navigation("Posts");
-
-                    b.Navigation("WeightHistoryLogs");
                 });
 
             modelBuilder.Entity("H2_Trainning.Models.Assignment", b =>

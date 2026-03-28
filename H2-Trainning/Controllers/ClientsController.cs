@@ -63,5 +63,34 @@ namespace H2_Trainning.Controllers
             if (!deleted) return NotFound();
             return NoContent();
         }
+
+        [HttpGet("pending")]
+        public async Task<IActionResult> GetPending()
+        {
+            var clients = await _service.GetPendingClientsAsync();
+            return Ok(clients);
+        }
+
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> Approve(string id)
+        {
+            try
+            {
+                var result = await _service.ApproveClientAsync(id, GetUserId());
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/reject")]
+        public async Task<IActionResult> Reject(string id)
+        {
+            var deleted = await _service.RejectClientAsync(id);
+            if (!deleted) return NotFound();
+            return NoContent();
+        }
     }
 }

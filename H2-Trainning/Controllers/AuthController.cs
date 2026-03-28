@@ -42,5 +42,19 @@ namespace H2_Trainning.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost("client-signup")]
+        public async Task<IActionResult> ClientSignup([FromBody] ClientSignupDto dto)
+        {
+            try
+            {
+                var result = await _authService.ClientSignupAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

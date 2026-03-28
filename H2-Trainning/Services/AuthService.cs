@@ -33,7 +33,8 @@ namespace H2_Trainning.Services
                 Email = dto.Email,
                 FullName = dto.FullName,
                 Role = role,
-                Goal = dto.Goal
+                Goal = dto.Goal,
+                IsApproved = true // Direct registration is always approved
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
@@ -52,6 +53,35 @@ namespace H2_Trainning.Services
             };
         }
 
+        public async Task<MessageDto> ClientSignupAsync(ClientSignupDto dto)
+        {
+            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
+            if (existingUser != null)
+                throw new Exception("A user with this email already exists.");
+
+            var user = new AppUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                FullName = dto.FullName,
+                Role = Role.Client,
+                Goal = dto.Goal,
+                IsApproved = false // Pending coach approval
+            };
+
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Registration failed: {errors}");
+            }
+
+            return new MessageDto
+            {
+                Message = "Your account has been created and is pending coach approval. You will be able to log in once approved."
+            };
+        }
+
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
@@ -61,6 +91,10 @@ namespace H2_Trainning.Services
             var valid = await _userManager.CheckPasswordAsync(user, dto.Password);
             if (!valid)
                 throw new Exception("Invalid email or password.");
+
+            // Block unapproved clients
+            if (user.Role == Role.Client && !user.IsApproved)
+                throw new Exception("Your account is pending coach approval. Please wait for your coach to approve your registration.");
 
             var token = JwtHelper.GenerateToken(user, _config);
 
@@ -77,7 +111,8 @@ namespace H2_Trainning.Services
             FullName = user.FullName,
             Email = user.Email!,
             Role = user.Role.ToString(),
-            Goal = user.Goal
+            Goal = user.Goal,
+            IsApproved = user.IsApproved
         };
     }
 }

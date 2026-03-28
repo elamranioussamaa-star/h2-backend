@@ -1,7 +1,8 @@
-﻿using H2_Trainning.Enums;
+using H2_Trainning.Enums;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Text.Json.Serialization;
 
 namespace H2_Trainning.Models
 {
@@ -9,10 +10,16 @@ namespace H2_Trainning.Models
     {
         [Required, MaxLength(100)]
         public string FullName { get; set; }
+        [JsonIgnore]
+        public ICollection<Post> Posts { get; set; } = new List<Post>();
+
+        [JsonIgnore]
+        public ICollection<WeightHistoryLog> WeightHistoryLogs { get; set; } = new List<WeightHistoryLog>();
         [Required]
         public Role Role { get; set; }       // enum: Coach, Client
         [MaxLength(200)]
         public string? Goal { get; set; }    // clients only
+        public bool IsApproved { get; set; } = true; // false for pending client signups
         public string? CoachId { get; set; } // FK → coach that owns this client
         public AppUser? Coach { get; set; }
 

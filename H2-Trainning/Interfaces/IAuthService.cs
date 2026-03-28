@@ -6,5 +6,6 @@ namespace H2_Trainning.Interfaces
     {
         Task<AuthResponseDto> RegisterAsync(RegisterDto dto);
         Task<AuthResponseDto> LoginAsync(LoginDto dto);
+        Task<MessageDto> ClientSignupAsync(ClientSignupDto dto);
     }
 }

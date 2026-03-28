@@ -1,4 +1,5 @@
 using H2_Trainning.Dtos;
+using H2_Trainning.Models;
 
 namespace H2_Trainning.Interfaces
 {
@@ -9,6 +10,6 @@ namespace H2_Trainning.Interfaces
         Task<ReservationDto> BookAsync(string clientId, CreateReservationDto dto);
         Task<bool> CancelAsync(int id, string userId);
         Task<ReservationDto?> ConfirmAsync(int id, string coachId);
-        Task<ReservationDto?> RejectAsync(int id, string coachId);
+        Task<ReservationDto?> RejectAsync(int id, string coachId, string? reason);
     }
 }

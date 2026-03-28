@@ -42,7 +42,8 @@ namespace H2_Trainning.Services
                 FullName = dto.FullName,
                 Role = Role.Client,
                 Goal = dto.Goal,
-                CoachId = coachId
+                CoachId = coachId,
+                IsApproved = true // Coach-created clients are auto-approved
             };
 
             var result = await _userManager.CreateAsync(client, dto.Password);
@@ -66,13 +67,44 @@ namespace H2_Trainning.Services
             return await _repo.DeleteAsync(clientId, coachId);
         }
 
+        public async Task<List<UserDto>> GetPendingClientsAsync()
+        {
+            var clients = await _repo.GetPendingClientsAsync();
+            return clients.Select(MapToDto).ToList();
+        }
+
+        public async Task<UserDto> ApproveClientAsync(string clientId, string coachId)
+        {
+            var user = await _repo.GetByIdAsync(clientId);
+            if (user == null || user.Role != Role.Client || user.IsApproved)
+                throw new Exception("Pending client not found.");
+
+            user.IsApproved = true;
+            user.CoachId = coachId;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Failed to approve client: {errors}");
+            }
+
+            return MapToDto(user);
+        }
+
+        public async Task<bool> RejectClientAsync(string clientId)
+        {
+            return await _repo.DeletePendingAsync(clientId);
+        }
+
         private static UserDto MapToDto(AppUser u) => new()
         {
             Id = u.Id,
             FullName = u.FullName,
             Email = u.Email!,
             Role = u.Role.ToString(),
-            Goal = u.Goal
+            Goal = u.Goal,
+            IsApproved = u.IsApproved
         };
     }
 }

@@ -8,5 +8,7 @@ namespace H2_Trainning.Interfaces
         Task<List<AppUser>> SearchClientsAsync(string coachId, string query);
         Task<AppUser?> GetByIdAsync(string id);
         Task<bool> DeleteAsync(string clientId, string coachId);
+        Task<List<AppUser>> GetPendingClientsAsync();
+        Task<bool> DeletePendingAsync(string clientId);
     }
 }

@@ -104,13 +104,38 @@ namespace H2_Trainning.Repositories
             return log;
         }
 
-        public async Task<List<ExerciseLog>> GetExerciseWeightHistoryAsync(string clientId, int exerciseId)
+        public async Task<List<WeightHistoryLog>> GetExerciseWeightHistoryAsync(string clientId, int exerciseId)
         {
-            return await _context.ExerciseLogs
-                .Include(el => el.Assignment)
-                .Where(el => el.Assignment.ClientId == clientId && el.ExerciseId == exerciseId && el.Weight.HasValue)
-                .OrderBy(el => el.Assignment.AssignedDate)
+            return await _context.WeightHistoryLogs
+                .Where(w => w.ClientId == clientId && w.ExerciseId == exerciseId)
+                .OrderBy(w => w.LoggedAt)
                 .ToListAsync();
+        }
+
+        public async Task AddOrUpdateWeightHistoryAsync(string clientId, int exerciseId, double weight, string? notes, DateTime date)
+        {
+            var existing = await _context.WeightHistoryLogs
+                .FirstOrDefaultAsync(w => w.ClientId == clientId && w.ExerciseId == exerciseId && w.LoggedAt.Date == date.Date);
+
+            if (existing != null)
+            {
+                existing.Weight = weight;
+                if (notes != null) existing.Notes = notes;
+                _context.WeightHistoryLogs.Update(existing);
+            }
+            else
+            {
+                var newLog = new WeightHistoryLog
+                {
+                    ClientId = clientId,
+                    ExerciseId = exerciseId,
+                    Weight = weight,
+                    Notes = notes,
+                    LoggedAt = date.Date
+                };
+                _context.WeightHistoryLogs.Add(newLog);
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -59,9 +59,9 @@ namespace H2_Trainning.Controllers
 
         [HttpPatch("{id}/reject")]
         [Authorize(Roles = "Coach")]
-        public async Task<IActionResult> Reject(int id)
+        public async Task<IActionResult> Reject(int id, [FromBody] RejectReservationDto dto)
         {
-            var result = await _service.RejectAsync(id, GetUserId());
+            var result = await _service.RejectAsync(id, GetUserId(), dto.Reason);
             if (result == null) return NotFound(new { message = "Reservation not found or not pending." });
             return Ok(result);
         }
