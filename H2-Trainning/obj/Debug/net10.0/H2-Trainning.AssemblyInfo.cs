@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("H2-Trainning")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c8dde20eba14d4b7185d666ad390164d04b57afe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ef08977abd7e0bb29de36bf031bedb933fea99cc")]
 [assembly: System.Reflection.AssemblyProductAttribute("H2-Trainning")]
 [assembly: System.Reflection.AssemblyTitleAttribute("H2-Trainning")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -95,16 +95,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins(
-                  "http://localhost:3000", 
-                  "http://localhost:5173", 
-                  "http://localhost:5174",
-                  "http://localhost:5175",
-                  "https://h2-trainning.vercel.app",
-                  "https://www.h2-coaching.com",
-                  "https://h2-coaching.com"
-              )
-              .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost") // Allow any localhost port
+        policy.SetIsOriginAllowed(origin => 
+              {
+                  var host = new Uri(origin).Host;
+                  return host == "localhost" || 
+                         host.EndsWith(".vercel.app") || 
+                         host == "h2-coaching.com" || 
+                         host == "www.h2-coaching.com";
+              })
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
